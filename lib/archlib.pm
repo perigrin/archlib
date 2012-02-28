@@ -2,38 +2,78 @@ package archlib;
 use strict;
 use warnings;
 
-use Archive::Tar;
+#use Archive::Tar;
 use Carp qw/croak/;
 
 our $VERSION = '0.001';
 our @ARCHINC;
-our $TAR = Archive::Tar->new;
+our @ORDER
+    = $ENV{ARCHLIB_ORDER}
+    ? split( /\s/, $ENV{ARCHLIB_ORDER} )
+    : qw(Archive::Peek::Libarchive Archive::Peek::External Archive::Tar);
 
-unshift @INC => \&find;
+our %CONF = (
+    'Archive::Peek::Libarchive' => sub {
+        my ( $sub, $mod ) = @_;
+        for my $arch (@ARCHINC) {
+            my $TAR = Archive::Peek::Libarchive->new( filename => $arch );
+            next unless $TAR->file($mod);
+            my @data = split /\n/, $TAR->file($mod);
+            return sub {
+                return 0 unless @data;
+                $_ = shift(@data);
+                return 1;
+            };
+        }
+        return;
+    },
+    'Archive::Peek::External' => sub {
+        my ( $sub, $mod ) = @_;
+        for my $arch (@ARCHINC) {
+            my $TAR = Archive::Peek::External->new( filename => $arch );
+            next unless $TAR->file($mod);
+            my @data = split /\n/, $TAR->file($mod);
+            return sub {
+                return 0 unless @data;
+                $_ = shift(@data);
+                return 1;
+            };
+        }
+        return;
+    },
+    'Archive::Tar' => sub {
+        my ( $sub, $mod ) = @_;
+        my $TAR = Archive::Tar->new;
+        for my $arch (@ARCHINC) {
+            $TAR->read($arch);
+            next unless $TAR->contains_file($mod);
+            my @data = split /\n/, $TAR->get_content($mod);
+            return sub {
+                return 0 unless @data;
+                $_ = shift(@data);
+                return 1;
+            };
+        }
+        return;
+    },
+);
+
+foreach my $module (@ORDER) {
+    eval "require $module";
+    unless ($@) {
+        unshift @INC, $CONF{$module};
+        last;
+    }
+}
 
 sub import {
     my $class = shift;
-    for my $item ( @_ ) {
+    for my $item (@_) {
         croak "No such archive '$item'"
             unless -e $item;
 
         push @ARCHINC => $item;
     }
-}
-
-sub find {
-    my ( $sub, $mod ) = @_;
-    for my $arch ( @ARCHINC ) {
-        $TAR->read( $arch );
-        next unless $TAR->contains_file( $mod );
-        my @data = split /\n/, $TAR->get_content( $mod );
-        return sub {
-            return 0 unless @data;
-            $_ = shift( @data );
-            return 1;
-       }
-    }
-    return;
 }
 
 1;
