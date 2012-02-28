@@ -1,0 +1,41 @@
+NAME
+    archlib - Add tar archive to @INC path
+
+SYNOPSIS
+        use archlib 'path/to/archive1.tar.gz';
+        use archlib 'path/to/archive2.tar.bz2';
+
+        use Module::In::Archive1;
+        use Module::In::Archive2;
+
+        ...
+
+ARCHIVE SPECIFICATIONS
+    The root of the archive is the root of the search path, ie:
+
+        archive1.tar.bz2:
+         TopLevel.pm
+         My/Module.pm
+         DeeperPath/To/Module.pm
+
+    You must NOT put everything into a 'lib' directory.
+
+UNDER THE HOOD
+    This module will unshift a subroutine into @INC. This routine will
+    iterate all archives that have been added looking for each module
+    loaded. If the module is not present in any archive other @INC entries
+    will be checked. The module maintains a package variable containing the
+    list of archives.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2012 Chad Granum
+
+    archlib is free software; Standard perl licence.
+
+    archlib is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the license for more details.
+
