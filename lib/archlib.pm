@@ -127,9 +127,11 @@ archlib - Add tar archive to @INC path
 
     use archlib 'path/to/archive1.tar.gz';
     use archlib 'path/to/archive2.tar.bz2';
+    use archlib 'path/to/archive3.zip';
 
     use Module::In::Archive1;
     use Module::In::Archive2;
+    use Module::In::Archive3;
 
     ...
 
@@ -153,9 +155,35 @@ loaded. If the module is not present in any archive other @INC entries will be
 checked. The module maintains a package variable containing the list of
 archives.
 
+=head1 ARCHIVE MANAGEMENT
+
+=head2 TAR.*
+
+Will try the following in order, you may also specify your own list in the
+C<$ENV{ARCHLIB_TAR_ORDER}> environment variable.
+
+=over 4
+
+=item Archive::Peek::Libarchive
+
+=item Archive::Peek::External
+
+=item Archive::Tar
+
+=back
+
+=head2 ZIP
+
+Uses L<Archive::Zip> if it is installed, otherwise it will ask you to install
+it in an error message.
+
 =head1 AUTHORS
 
 Chad Granum L<exodist7@gmail.com>
+
+=head1 CONTRIBUTORS
+
+Chris Prather L<chris@prather.org>
 
 =head1 COPYRIGHT
 
