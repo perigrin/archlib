@@ -4,9 +4,11 @@ NAME
 SYNOPSIS
         use archlib 'path/to/archive1.tar.gz';
         use archlib 'path/to/archive2.tar.bz2';
+        use archlib 'path/to/archive3.zip';
 
         use Module::In::Archive1;
         use Module::In::Archive2;
+        use Module::In::Archive3;
 
         ...
 
@@ -27,8 +29,24 @@ UNDER THE HOOD
     will be checked. The module maintains a package variable containing the
     list of archives.
 
+ARCHIVE MANAGEMENT
+  TAR.*
+    Will try the following in order, you may also specify your own list in
+    the $ENV{ARCHLIB_TAR_ORDER} environment variable.
+
+    Archive::Peek::Libarchive
+    Archive::Peek::External
+    Archive::Tar
+
+  ZIP
+    Uses Archive::Zip if it is installed, otherwise it will ask you to
+    install it in an error message.
+
 AUTHORS
     Chad Granum exodist7@gmail.com
+
+CONTRIBUTORS
+    Chris Prather chris@prather.org
 
 COPYRIGHT
     Copyright (C) 2012 Chad Granum

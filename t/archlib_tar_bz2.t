@@ -16,7 +16,7 @@ BEGIN {
     );
     chdir $dir;
 }
-$ENV{ARCHLIB_ORDER}='Archive::Tar';
+$ENV{ARCHLIB_TAR_ORDER} = 'Archive::Tar';
 use_ok 'archlib', 't/inc.tar.bz2';
 use_ok 'ArchLibTest';
 
