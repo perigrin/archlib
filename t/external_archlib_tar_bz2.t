@@ -6,8 +6,10 @@ use Test::More;
 
 use Cwd;
 use Archive::Tar;
-eval 'require  Archive::Peek::External';
-if ($@) { plan skip_all => 'Requires  Archive::Peek::External'; exit }
+unless( eval 'require Archive::Peek::External; 1' ) {
+    plan skip_all => 'Requires  Archive::Peek::External';
+    exit;
+}
 
 BEGIN {
     my $dir = getcwd;
@@ -17,7 +19,7 @@ BEGIN {
     chdir $dir;
 }
 
-$ENV{ARCHLIB_ORDER}='Archive::Peek::External';
+$ENV{ARCHLIB_TAR_ORDER}='Archive::Peek::External';
 use_ok 'archlib', 't/inc.tar.bz2';
 use_ok 'ArchLibTest';
 

@@ -6,8 +6,10 @@ use Test::More;
 
 use Cwd;
 use Archive::Tar;
-eval 'require  Archive::Peek::Libarchive';
-if ($@) { plan skip_all => 'Requires  Archive::Peek::Libarchive'; exit }
+unless( eval 'require Archive::Peek::Libarchive; 1' ) {
+    plan skip_all => 'Requires Archive::Peek::Libarchive';
+    exit;
+}
 
 BEGIN {
     my $dir = getcwd;
@@ -20,6 +22,7 @@ BEGIN {
     chdir $dir;
 }
 
+$ENV{ARCHLIB_TAR_ORDER}='Archive::Peek::Libarchive';
 use_ok 'archlib', 't/inc.tar.gz';
 use_ok 'ArchLibTest';
 
